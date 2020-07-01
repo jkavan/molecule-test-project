@@ -1,0 +1,21 @@
+---
+- hosts: all
+  become: True
+
+  tasks:
+    - name: Install Apache.
+      apt:
+        name:
+          - apache2
+        state: present
+        update_cache: true
+
+    - name: Start Apache and configure it to run at boot.
+      service:
+        name: apache2
+        state: started
+        enabled: true
+
+  roles:
+    - common
+    - oefenweb.fail2ban

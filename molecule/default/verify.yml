@@ -1,0 +1,36 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+
+  # Returns OK if the web request returns status code 200
+  tasks:
+  - name: Verify Apache is serving web requests on localhost.
+    uri:
+      url: http://localhost/
+      status_code: 200
+
+  # Returns OK if the process is running.
+  - name: Verify Fail2ban is running.
+    shell: ps -ef | grep -q fail2ban2
+    register: fail2ban_is_running
+    changed_when: False
+    failed_when: fail2ban_is_running.rc != 0
+
+  # Returns OK, when the correct string is found in the log file.
+  # Matches both ssh and sshd
+  - name: Verify Fail2ban SSH jail is started.
+    become: True
+    shell: grep -qE "Jail 'ssh(d)?' started" /var/log/fail2ban.log
+    register: fail2ban_ssh_jail_started
+    changed_when: False
+    failed_when: fail2ban_ssh_jail_started.rc != 0
+
+  # Returns OK if the log file doesn't contain the word ERROR.
+  - name: Verify Fail2ban log doesn't contain errors.
+    become: True
+    shell: grep -iwq ERROR /var/log/fail2ban.log
+    register: fail2ban_no_errors
+    changed_when: False
+    failed_when: fail2ban_no_errors.rc == 0

@@ -1,0 +1,3 @@
+---
+ssh:
+  prohibit_password: 'prohibit-password'
